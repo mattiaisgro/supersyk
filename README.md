@@ -18,7 +18,7 @@ $$
 \\{ \psi_i, \bar \psi_j \\} = \delta_{ij}
 $$
 
-while all other anticommutators are zero. The $C_{ijk}$ are complex numbers with a Gaussian distribution with variance $\langle C_{ijk} \bar C^{ijk} \rangle = 2J/N$. The system has the two supercharges $Q, \bar Q = Q^\dagger$ which are used to define the Hamiltonian:
+while all other anticommutators are zero. The $C_{ijk}$ are complex numbers with a Gaussian distribution with variance $\langle |C_{ijk}|^2 \rangle = 2J/N$. The system has the two supercharges $Q, \bar Q = Q^\dagger$ which are used to define the Hamiltonian:
 
 $$
 H = \\{Q, \bar Q\\}
@@ -30,12 +30,6 @@ The first step in the study of the system is constructing a numerical representa
 $$\\{ \psi_i, \bar \psi_j \\} = \delta_{ij}$$
 $$\\{ \psi_i, \psi^j \\} = 0$$
 
-One way to view the complex fermion modes is as composed of two real fermions each:
-
-$$\psi_j = \frac{1}{\sqrt{2}} (\chi_j^{(1)} - i \chi_j^{(2)})$$
-$$\\{ \chi_i, \chi_j \\} = \delta_{ij}$$
-
-where the fermions are now real, so $\chi_j^\dagger = \chi_j$. If we have N complex fermions, we thus have 2N real fermions.
 Our objective is to represent the algebra of complex fermion operators $\psi_j, \bar \psi_j$ as complex matrices acting over states.
 Since the action of fermion creation and annihilation operators is to create and destroy a fermion at site $j$, with at most 1 fermion in each site, we can view a generic state as:
 
@@ -46,18 +40,16 @@ Considering a system with N=2, we see that the number of possible states quickly
 
 $$|00\rangle, |01\rangle, |10\rangle, |11\rangle$$
 
-In general, for N fermions the total number of states is $2^N$, which causes an exponential growth of states.
-A possible approach to building a representation for the algebra of N fermions is based on the Jordan-Wigner transform,
-which connects spin systems to fermion systems and vice versa. The base construction makes use of Pauli matrices $\sigma^i$:
+In general, for N fermions the total number of states is $2^N$. A possible approach to building a representation for the algebra of N fermions is based on the Jordan-Wigner transform, which connects spin systems to fermion systems and vice versa. The base construction makes use of Pauli matrices $\sigma^i$:
 
 $$\psi_j \sim \frac{1}{\sqrt{2}} (\sigma_j^x - i \sigma^y_j)$$
 
-where the $j$-th sigma matrix acts on the space of site $j$. This construction respects the anticommuting relations for a single site,
+where the $j$-th sigma matrix acts on site $j$. This construction respects the anticommutation relations for a single site,
 but when different sites are considered it breaks down. This prompts the use of a "Wigner sign", an overall phase dependent on the previous occupation numbers, which corrects this behavior:
 
-$$e^{i\pi \sum_k \psi_k^\dagger \psi_k} = \prod_k^{j-1} (-\sigma_z) $$
+$$e^{i\pi \sum_k \psi_k^\dagger \psi_k} = \prod_k^{j-1} (-\sigma^z_k) $$
 
-$$\psi_j = \frac{1}{\sqrt{2}} \Big[\prod_k^{j-1} (-\sigma_z)\Big] (\sigma_j^x - i \sigma^y_j)$$
+$$\psi_j = \frac{1}{\sqrt{2}} \Big[\prod_k^{j-1} (-\sigma^z_k)\Big] (\sigma_j^x - i \sigma^y_j)$$
 
 This construction gives the correct representation of the fermion algebra, respecting all anticommutation relations.
 
