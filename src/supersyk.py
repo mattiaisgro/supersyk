@@ -17,15 +17,12 @@ def coupling(N: int, J: float, seed: int):
 
     np.random.seed(seed)
     C = np.zeros((N, N, N), dtype=complex)
+    stdev = np.sqrt(J / N)
 
     for i in range(N):
         for j in range(i + 1, N):
             for k in range(j + 1, N):
-
-                phase = np.random.uniform(0, 2 * np.pi)
-                modulus = np.random.normal(0, np.sqrt(J / N))
-
-                C[i, j, k] = modulus * np.exp(1j * phase)
+                C[i, j, k] = np.random.normal(0, stdev) + 1j * np.random.normal(0, stdev)
 
     return C
 
@@ -55,7 +52,6 @@ Construct the Hamiltonian H = {Q, Q^dagger} from the supercharge Q.
 """
 def hamiltonian(Q):
     return Q @ Q.conj().T + Q.conj().T @ Q
-
 
 
 """
