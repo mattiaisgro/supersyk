@@ -32,14 +32,14 @@ def annihilate(j: int, N: int):
         occupied_before = state & ((1 << j) - 1)
         sign = (-1) ** occupied_before.bit_count()
 
-        # The new state is the current state with the
-        # j-th mode either removed or added
+        # The new state is the same with the j-th mode removed,
+        # achieved with a XOR on the j-th bit.
         new_state = state ^ (1 << j)
 
-        if sign != 0:
-            psi[new_state, state] = sign
+        psi[new_state, state] = sign
 
-    return psi
+    # Prefer CSR for arithmetics
+    return sparse.csr_matrix(psi)
 
 
 """
@@ -79,7 +79,7 @@ If the module is run as a script, run a simple test.
 """
 if __name__ == "__main__":
 
-    N = 4
+    N = 6
     annihilation, creation = representation(N)
 
     print("psi_0:")

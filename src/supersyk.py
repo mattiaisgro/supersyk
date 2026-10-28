@@ -5,7 +5,7 @@ Construct the supercharge and Hamiltonian for the supersymmetric SYK model.
 
 import fermions
 import numpy as np
-
+import scipy.sparse as sparse
 
 
 """
@@ -35,7 +35,7 @@ def supercharge(representation, couplings):
 
     N = len(representation[0])
     dimH = 2**N
-    Q = np.zeros((dimH, dimH), dtype=complex)
+    Q = sparse.lil_matrix((dimH, dimH), dtype=complex)
 
     annihilation = representation[0]
 
@@ -44,14 +44,43 @@ def supercharge(representation, couplings):
             for k in range(j + 1, N):
                 Q += couplings[i, j, k] * (annihilation[i] @ annihilation[j] @ annihilation[k])
 
-    return Q
+    return sparse.csr_matrix(Q) * 1j
+
+
+"""
+Construct the supercharge Q = sum_{i<j<k} C_ijk psi_i psi_j psi_k
+generating the random couplings progressively,
+without storing the coupling tensor.
+"""
+def supercharge(representation, N: int, J: float, seed: int):
+
+    np.random.seed(seed)
+    N = len(representation[0])
+    dimH = 2**N
+    Q = sparse.lil_matrix((dimH, dimH), dtype=complex)
+    stdev = np.sqrt(J / N)
+
+    annihilation = representation[0]
+
+    for i in range(N):
+        for j in range(i + 1, N):
+            for k in range(j + 1, N):
+                Cijk = np.random.normal(0, stdev) + 1j * np.random.normal(0, stdev)
+                Q += Cijk * (annihilation[i] @ annihilation[j] @ annihilation[k])
+
+    return sparse.csr_matrix(Q) * 1j
+
 
 
 """
 Construct the Hamiltonian H = {Q, Q^dagger} from the supercharge Q.
 """
 def hamiltonian(Q):
-    return Q @ Q.conj().T + Q.conj().T @ Q
+
+    H = Q @ Q.conj().T + Q.conj().T @ Q
+
+    # Enforce Hermiticity to account for numerical errors
+    return 0.5 * (H + H.conj().T)
 
 
 """

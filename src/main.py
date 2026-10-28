@@ -1,6 +1,6 @@
 
 """
-Main program of the study on the spectrum of the N=2 supersymmetric SYK model.
+Main program for the study of the N=2 supersymmetric SYK model.
 """
 
 import fermions
@@ -9,22 +9,33 @@ import observables
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.sparse as sparse
 
 
 """
-Specify the observable under study.
+Simulation parameters
 """
-def observable(psi, psi_bar, P):
+N = 12
+J = 1.0
+seed = 42
+tol = 1e-12
 
-    return P @ psi[0] @ psi_bar[1] @ P
+
+"""
+Construct the operators to analyze, using their name
+as key and matrix representation as value.
+"""
+def operators(psi, psi_bar):
+
+    return {
+        "\psi_1 \psi_2^\dagger": psi[0] @ psi_bar[1],
+        "\psi_1 \psi_2": psi[0] @ psi[1],
+        "\psi_1 \psi_2^\dagger \psi_3 \psi_4^\dagger": psi[0] @ psi_bar[1] @ psi[2] @ psi_bar[3],
+    }
 
 
 
 if __name__ == "__main__":
-
-    N = 12
-    J = 1.0
-    seed = 42
 
     print("Parameters:")
     print("N =", N)
@@ -32,13 +43,13 @@ if __name__ == "__main__":
     print("dim(H) =", 2**N)
 
     print("Generating representation and Hamiltonian...")
-    couplings = supersyk.coupling(N, J, seed)
     rep = fermions.representation(N)
-    Q = supersyk.supercharge(rep, couplings)
+    Q = supersyk.supercharge(rep, N, J, seed)
     H = supersyk.hamiltonian(Q)
 
     print("Diagonalizing the Hamiltonian...")
-    eigenvalues_, eigenvectors = np.linalg.eigh(H)
+    eigenvalues_, eigenvectors = np.linalg.eigh(H.toarray())
+
     eigenvalues = np.array([E.real for E in eigenvalues_])
 
 
@@ -47,47 +58,51 @@ if __name__ == "__main__":
     P = observables.projector(eigenvalues, eigenvectors)
     psi, psi_bar = rep
 
-    operator = observable(psi, psi_bar, P)
-    op_eigenvalues = np.linalg.eigvals(operator)
+    # Observables under study
+    operators = operators(psi, psi_bar)
+    operators_eigs = {}
 
-
-    print("Energy spectrum:")
-    print(eigenvalues)
+    for name, O in operators.items():
+        O_proj = observables.project(O, P)
+        eigs = np.linalg.eigvals(O_proj)
+        operators_eigs[name] = eigs
+        deg = np.sum(np.abs(eigs) < tol)
+        print(f"Zero eigenvalues for {name}:", deg, f"({deg / len(eigs):.2%})")
 
     # Count the number of degenerate ground states
-    ground_deg = 0
-    for E in eigenvalues:
-        if abs(E) < 1e-12:
-            ground_deg += 1
+    ground_deg = np.sum(np.abs(eigenvalues) < tol)
 
-    print("Ground state degeneracy: ", ground_deg)
-
+    print("Ground state degeneracy: ", ground_deg, f"({ground_deg / (2**N):.2%})")
 
     # Plot full spectrum histogram
     fig, ax = plt.subplots()
-    ax.hist(eigenvalues, bins = 35)
+    ax.hist(eigenvalues, bins=35, alpha=0.75)
     ax.set_xlabel("Energy $E$")
-    ax.set_ylabel("Number of states")
+    ax.set_ylabel("Counts")
     ax.set_title(f"Spectrum of the $\mathcal{{N}}=2$ supersymm. SYK model ($N={N}$, $J={J:.2f}$)")
 
     # Plot histogram of non-zero energies
     fig, ax = plt.subplots()
     ax.hist(
-        [eigenvalues[i].real for i in range(len(eigenvalues)) if abs(eigenvalues[i]) > 1e-12],
-        bins=35
+        eigenvalues[np.abs(eigenvalues) > tol].real,
+        bins=35, alpha=0.75
     )
     ax.set_xlabel("Energy $E$")
-    ax.set_ylabel("Number of states")
+    ax.set_ylabel("Counts")
     ax.set_title(f"Excitations of the $\mathcal{{N}}=2$ supersymm. SYK model ($N={N}$, $J={J:.2f}$)")
 
     # Plot histogram of the eigenvalues of the projected operator
-    fig, ax = plt.subplots()
-    ax.hist(
-        [op_eigenvalues[i].real for i in range(len(op_eigenvalues)) if abs(op_eigenvalues[i]) > 1e-12],
-        bins=35
-    )
-    ax.set_xlabel("Eigenvalues of $P \psi_1 \psi_2^\dagger P$")
-    ax.set_ylabel("Number of states")
-    ax.set_title(f"Projected operator spectrum ($N={N}$, $J={J:.2f}$)")
+    for name, O in operators.items():
+
+        eigs = operators_eigs[name]
+        fig, ax = plt.subplots()
+        ax.hist(
+            eigs[np.abs(eigs) > tol].real,
+            bins=30, alpha=0.75, label=f"$P {name} P$"
+        )
+        ax.set_xlabel("Eigenvalues")
+        ax.set_ylabel("Counts")
+        ax.set_title(f"Projected operator spectrum ($N={N}$, $J={J:.2f}$)")
+        ax.legend()
 
     plt.show()

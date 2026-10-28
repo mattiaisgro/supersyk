@@ -10,29 +10,45 @@ import numpy as np
 """
 Given the eigenvalues and eigenvectors of the Hamiltonian,
 construct the projector onto the degenerate ground states
-as the product G^\dagger G where G is the matrix of ground state eigenvectors.
+as the matrix of ground state eigenvectors.
 """
 def projector(eigenvalues, eigenvectors, tol = 1e-12):
     
     # Indices of ground state eigenvalues
-    ground_state_indices = np.where(np.abs(eigenvalues) < tol)[0]
+    indices = np.where(np.abs(eigenvalues) < tol)[0]
 
-    # Matrix of ground state eigenvectors
-    G = eigenvectors[:, ground_state_indices]
+    return eigenvectors[:, indices]
 
-    return G @ G.conj().T
+
+"""
+Use the projector to project a certain operator onto the degenerate ground states.
+"""
+def project(operator, P):
+
+    return P.conj().T @ operator @ P
+
+
+"""
+Compute the level spacing statistics of the Hamiltonian spectrum.
+"""
+def level_spacing(eigenvalues):
+    
+    eigs_sorted = np.sort(eigenvalues)
+    spacings = np.diff(eigs_sorted)
+
+    return spacings / np.mean(spacings)
 
 
 """
 If the script is run directly, run a test case which constructs the projector
-for N=6 and prints it.
+for the ground states of a random Hamiltonian.
 """
 if __name__ == "__main__":
 
     import fermions
     import supersyk
 
-    N = 4
+    N = 8
     J = 1.0
     seed = 42
 
