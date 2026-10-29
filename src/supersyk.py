@@ -77,10 +77,7 @@ Construct the Hamiltonian H = {Q, Q^dagger} from the supercharge Q.
 """
 def hamiltonian(Q):
 
-    H = Q @ Q.conj().T + Q.conj().T @ Q
-
-    # Enforce Hermiticity to account for numerical errors
-    return 0.5 * (H + H.conj().T)
+    return Q @ Q.conj().T + Q.conj().T @ Q
 
 
 """
