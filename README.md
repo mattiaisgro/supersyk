@@ -54,3 +54,9 @@ $$|00\rangle = \hat e_1, |01\rangle = \hat e_2, |10\rangle = \hat e_3, |11\rangl
 This creates a natural representation of states which makes numerical implementations easier, as for example counting occupation numbers reduces to counting bits before the current state, while checking the occupation of a certain site amounts to checking its corresponding bit. This representation of states is sometimes called "bit string" or simply "string".
 
 Thus a possible approach to constructing the full fermion algebra could be to iteratively build the matrices by iterating over all states represented by bit strings, namely the integers $j \in \\{1, \dots, 2^N\\}$ and imposing the correct value according to the inner product over states, while remembering to introduce the Wigner sign to ensure correct anticommutation rules between different sites. We expect the matrices to be $2^N \times 2^N$, but they are generally sparse, as most elements are actually zero.
+
+## References
+- _Supersymmetric SYK models_, Fu, Gaiotto, Maldacena, Sachdev
+- _BPS Chaos_, Chen, Li, Shenker
+- _Microcanonical Operator Spectrum, BPS Chaos and Free Probability Theory_, Belin, Fu, La Rocca
+- _Looking at supersymmetric black holes for a very long time_, Lin, Maldacena, Rozenberg, Shan
