@@ -2,7 +2,7 @@
 
 > The syckest system out there.
 
-This repo contains code for numerical studies of quantum chaos in the supersimmetric Sachdev-Ye-Kitaev model.
+This repo contains code for numerical studies of quantum chaos in the supersymmetric Sachdev-Ye-Kitaev model.
 
 
 ## The $\mathcal{N}=2$ Super SYK Model

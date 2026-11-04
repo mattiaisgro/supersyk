@@ -81,6 +81,10 @@ if __name__ == "__main__":
     Q = supersyk.supercharge(rep, N, J, seed)
     H = supersyk.hamiltonian(Q)
 
+    # Check that the supercharge squares to zero
+    Q2_residual = np.linalg.norm(Q @ Q)
+    print("Q^2 =", Q2_residual.toarray()[0, 0].real)
+
     Number = fermion_number(rep[0], rep[1])
     vacuum = sparse.lil_matrix((2**N, 1), dtype=complex)
     vacuum[0, 0] = 1.0
@@ -89,7 +93,7 @@ if __name__ == "__main__":
     eigenvalues_, eigenvectors = np.linalg.eigh(H.toarray())
     eigenvalues = np.array([E.real for E in eigenvalues_])
     G = eigenvectors[:, np.where(np.abs(eigenvalues) < 1e-12)[0]]
-    print(f"Ground states: {G.shape[1]} ({G.shape[1] / len(eigenvalues):.2%})")
+    print(f"Ground state eigenvectors: {G.shape[1]} ({G.shape[1] / len(eigenvalues):.2%})")
 
     P = projector(eigenvalues, eigenvectors)
     print(f"Projector (N={N}):")
