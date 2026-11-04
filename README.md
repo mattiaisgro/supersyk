@@ -35,26 +35,14 @@ Since the action of fermion creation and annihilation operators is to create and
 
 $$| n_1, n_2, n_3, \dots \rangle = (\psi_1^\dagger)^{n_1} (\psi_2^\dagger)^{n_2} (\psi_3^\dagger)^{n_3} \dots | 0 \rangle$$
 
-where $|0\rangle$ is the vacuum state, with no fermions in any site, which is annihilated by all $\psi_j$. This is called the "occupation number basis".
-Considering a system with N=2, we see that the number of possible states quickly grows with N:
-
-$$|00\rangle, |01\rangle, |10\rangle, |11\rangle$$
-
-In general, for N fermions the total number of states is $2^N$. A possible approach to building a representation for the algebra of N fermions is based on the Jordan-Wigner transform, which connects spin systems to fermion systems and vice versa. The base construction makes use of Pauli matrices $\sigma^i$:
-
-$$\psi_j \sim \frac{1}{\sqrt{2}} (\sigma_j^x - i \sigma^y_j)$$
-
-where the $j$-th sigma matrix acts on site $j$. This construction respects the anticommutation relations for a single site,
-but when different sites are considered it breaks down. This prompts the use of a "Wigner sign", an overall phase dependent on the previous occupation numbers, which corrects this behavior:
-
-$$e^{i\pi \sum_k \psi_k^\dagger \psi_k} = \prod_k^{j-1} (-\sigma^z_k) $$
+where $|0\rangle$ is the vacuum state, with no fermions in any site, which is annihilated by all $\psi_j$. This is called the "occupation number basis". In general, for N fermions the total number of states is $2^N$, so the Hilbert space size grows exponentially in N. A possible approach to building a representation for the algebra of N fermions is based on the Jordan-Wigner transform, which connects spin systems to fermion systems and vice versa. The base construction makes use of Pauli matrices $\sigma^i$ and an additional "Wigner sign", an overall phase dependent on the previous occupation numbers, which guarantees the correct anticommutators for different sites:
 
 $$\psi_j = \frac{1}{\sqrt{2}} \Big[\prod_k^{j-1} (-\sigma^z_k)\Big] (\sigma_j^x - i \sigma^y_j)$$
 
 This construction gives the correct representation of the fermion algebra, respecting all anticommutation relations.
 
 ## Bit strings
-Another consideration should be taken into account: occupation numbers are either 0 or 1, and their collection writes out a number in the binary representation.
+As occupation numbers are either 0 or 1, their collection writes out a number in the binary representation.
 If we take the basis defined by representing a given occupation number basis state as the corresponding standard complex vector basis:
 
 $$| n_1 n_2 \dots \rangle = \hat e_{1 + (n_1 n_2 \dots)_{10}}$$
@@ -63,6 +51,6 @@ where we are representing the ordered occupation numbers as a number in base 10.
 
 $$|00\rangle = \hat e_1, |01\rangle = \hat e_2, |10\rangle = \hat e_3, |11\rangle = \hat e_4$$
 
-This creates a natural representation of states which makes numerical implementations drastically easier, as for example counting occupation numbers reduces to counting bits before the current state, while checking the occupation of a certain site amounts to checking its corresponding bit. This representation of states is sometimes called "bit string" or simply "string".
+This creates a natural representation of states which makes numerical implementations easier, as for example counting occupation numbers reduces to counting bits before the current state, while checking the occupation of a certain site amounts to checking its corresponding bit. This representation of states is sometimes called "bit string" or simply "string".
 
 Thus a possible approach to constructing the full fermion algebra could be to iteratively build the matrices by iterating over all states represented by bit strings, namely the integers $j \in \\{1, \dots, 2^N\\}$ and imposing the correct value according to the inner product over states, while remembering to introduce the Wigner sign to ensure correct anticommutation rules between different sites. We expect the matrices to be $2^N \times 2^N$, but they are generally sparse, as most elements are actually zero.
