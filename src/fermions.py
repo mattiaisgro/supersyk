@@ -7,14 +7,15 @@ import numpy as np
 import scipy.sparse as sparse
 
 
-"""
-Construct a 2^N x 2^N matrix representation of the fermion
-annihilation operator in the occupation-number basis.
-
-The parameter j is the mode index (0 <= j < N), and N is the total number of modes.
-The matrix representation is stored as a sparse matrix (psi_j)_{ik}.
-"""
 def annihilate(j: int, N: int):
+
+    """
+    Construct a 2^N x 2^N matrix representation of the fermion
+    annihilation operator in the occupation-number basis.
+
+    The parameter j is the mode index (0 <= j < N), and N is the total number of modes.
+    The matrix representation is stored as a sparse matrix (psi_j)_{ik}.
+    """
 
     dimH = 2**N
     psi = sparse.lil_matrix((dimH, dimH), dtype=complex)
@@ -42,13 +43,14 @@ def annihilate(j: int, N: int):
     return sparse.csr_matrix(psi)
 
 
-"""
-Construct the full representation of the fermionic algebra for N modes.
-
-Returns a list of pairs of annihilation and creation operators,
-where each operator is represented as a sparse matrix.
-"""
 def representation(N: int):
+
+    """
+    Construct the full representation of the fermionic algebra for N modes.
+
+    Returns a list of pairs of annihilation and creation operators,
+    where each operator is represented as a sparse matrix.
+    """
 
     annihilation = [ annihilate(j, N) for j in range(N) ]
     creation = [ operator.conj().T for operator in annihilation ]
@@ -56,11 +58,12 @@ def representation(N: int):
     return annihilation, creation
 
 
-"""
-Compute the total error on the anticommutation relations for the
-given fermion representation.
-"""
 def representation_error(annihilation, creation):
+
+    """
+    Compute the total error on the anticommutation relations for the
+    given fermion representation.
+    """
 
     N = len(annihilation)
     error = 0.0
@@ -74,10 +77,12 @@ def representation_error(annihilation, creation):
     return error
 
 
-"""
-If the module is run as a script, run a simple test.
-"""
+
 if __name__ == "__main__":
+
+    """
+    If the module is run as a script, run a simple test.
+    """
 
     N = 6
     annihilation, creation = representation(N)

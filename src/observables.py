@@ -7,12 +7,13 @@ import scipy.sparse as sparse
 import numpy as np
 
 
-"""
-Given the eigenvalues and eigenvectors of the Hamiltonian,
-construct the projector onto the degenerate ground states
-as the matrix of ground state eigenvectors.
-"""
 def projector(eigenvalues, eigenvectors, tol = 1e-12):
+
+    """
+    Given the eigenvalues and eigenvectors of the Hamiltonian,
+    construct the projector onto the degenerate ground states
+    as the matrix of ground state eigenvectors.
+    """
     
     # Indices of ground state eigenvalues
     indices = np.where(np.abs(eigenvalues) < tol)[0]
@@ -20,26 +21,29 @@ def projector(eigenvalues, eigenvectors, tol = 1e-12):
     return eigenvectors[:, indices]
 
 
-"""
-Use the projector to project a certain operator onto the degenerate ground states.
-"""
 def project(operator, P):
+
+    """
+    Use the projector to project a certain operator onto the degenerate ground states.
+    """
 
     return P.conj().T @ operator @ P
 
 
-"""
-Symmetrize the given operator to make it Hermitian with real eigenvalues.
-"""
 def symmetrize(operator):
+
+    """
+    Symmetrize the given operator to make it Hermitian with real eigenvalues.
+    """
 
     return 0.5 * (operator + operator.conj().T)
 
 
-"""
-Compute the level spacing statistics of the Hamiltonian spectrum.
-"""
 def level_spacing(eigenvalues):
+
+    """
+    Compute the level spacing statistics of the Hamiltonian spectrum.
+    """
     
     eigs_sorted = np.sort(eigenvalues)
     spacings = np.diff(eigs_sorted)
@@ -47,11 +51,12 @@ def level_spacing(eigenvalues):
     return spacings / np.mean(spacings)
 
 
-"""
-Get a representation of the fermion number operator from
-the matrix representation of the complex fermions.
-"""
 def fermion_number(psi, psi_bar):
+
+    """
+    Get a representation of the fermion number operator from
+    the matrix representation of the complex fermions.
+    """
 
     dimH = psi[0].shape[0]
     N = sparse.lil_matrix((dimH, dimH), dtype=complex)
@@ -62,12 +67,26 @@ def fermion_number(psi, psi_bar):
     return sparse.csr_matrix(N)
 
 
+def r_charge(psi, psi_bar):
 
-"""
-If the script is run directly, run a test case which constructs the projector
-for the ground states of a random Hamiltonian.
-"""
+    """
+    Get a representation of the R-charge operator from
+    the matrix representation of the complex fermions.
+    """
+
+    N = len(psi)
+    dimH = psi[0].shape[0]
+
+    return fermion_number(psi, psi_bar) - N/2 * sparse.identity(dimH, dtype=complex)
+
+
+
 if __name__ == "__main__":
+
+    """
+    If the script is run directly, run a test case which constructs the projector
+    for the ground states of a random Hamiltonian.
+    """
 
     import fermions
     import supersyk

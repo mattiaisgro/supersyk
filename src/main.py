@@ -54,8 +54,24 @@ if __name__ == "__main__":
     Q = supersyk.supercharge(rep, N, J, seed)
     H = supersyk.hamiltonian(Q)
 
-    print("Diagonalizing the Hamiltonian...")
-    eigenvalues, eigenvectors = np.linalg.eigh(H.toarray())
+
+    # Before diagonalizing the Hamiltonian, check if an already
+    # computed spectrum has been previously cached.
+    filename = f"hamiltonian_N={N}_J={J:.2f}_seed={seed}.npz"
+    eigenvalues, eigenvectors = None, None
+
+    try:
+        data = np.load(filename)
+        eigenvalues = data["eigenvalues"]
+        eigenvectors = data["eigenvectors"]
+        print(f"Loaded cached Hamiltonian spectrum from {filename}.")
+
+    except FileNotFoundError:
+        print(f"Diagonalizing the Hamiltonian...")
+        eigenvalues, eigenvectors = np.linalg.eigh(H.toarray())
+        np.savez(filename, eigenvalues=eigenvalues, eigenvectors=eigenvectors)
+        print(f"Saved Hamiltonian spectrum to {filename}.")
+
 
     # Construct observables and project them onto the ground subspace
     print("Diagonalizing the projected observable...")

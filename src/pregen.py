@@ -4,17 +4,19 @@ Generate Hamiltonians for the supersymmetric SYK model
 and save them to file for later analysis.
 """
 
+import sys
+
 import fermions
 import supersyk
-import numpy as np
 import scipy.io
 
 
-"""
-Pre-generate a Hamiltonian for the supersymmetric SYK model
-with the given parameters and save it to file.
-"""
 def hamiltonian(N, J, seed, filename=""):
+
+    """
+    Pre-generate a Hamiltonian for the supersymmetric SYK model
+    with the given parameters and save it to file.
+    """
 
     if filename == "":
         filename = f"hamiltonian_N={N}_J={J:.2f}"
@@ -26,15 +28,18 @@ def hamiltonian(N, J, seed, filename=""):
     scipy.io.mmwrite(filename, H, symmetry="hermitian")
 
 
-"""
-If the script is run directly, generate and save
-a random matrix for the given parameters.
-"""
+
 if __name__ == "__main__":
 
-    N = 12
-    J = 100
-    seed = 42
+    """
+    If the script is run directly, generate and save
+    a random matrix for the given parameters,
+    passed as command line arguments: N, J, seed.
+    """
+
+    N = int(sys.argv[1]) if len(sys.argv) > 1 else 12
+    J = float(sys.argv[2]) if len(sys.argv) > 2 else 1.0
+    seed = int(sys.argv[3]) if len(sys.argv) > 3 else 42
 
     print("Parameters:")
     print("N =", N)
