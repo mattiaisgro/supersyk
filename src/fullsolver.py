@@ -1,6 +1,10 @@
 
 """
-Main program for the study of the N=2 supersymmetric SYK model.
+Full eigensystem solver for the N=2 supersymmetric SYK model.
+
+This approach is slower and more memory-intensive BlockSolver,
+which should be preferred for analyzing a certain R-charge sector.
+It is however needed for full spectrum diagnostics.
 """
 
 import fermions
