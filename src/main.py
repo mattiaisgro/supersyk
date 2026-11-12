@@ -9,7 +9,6 @@ import observables
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.sparse as sparse
 
 
 """
@@ -20,25 +19,30 @@ J = 25
 seed = 42
 tol = 1e-12
 
+"""
+Plots to generate and display
+"""
 plots = [
     "energy_spectrum",
     "operators_spectrum",
     "spacings",
-    #"fermion_number"
 ]
 
 
-"""
-Construct the operators to analyze, using their name
-as key and matrix representation as value.
-"""
 def operators(psi, psi_bar):
+
+    """
+    Construct the operators to analyze, using their name
+    as key and matrix representation as value.
+    The listed operators are projected onto the ground subspace
+    and their eigenvalues are automatically analyzed.
+    """
 
     return {
         f"\psi_1 \psi_2^\dagger": observables.symmetrize( psi[0] @ psi_bar[1] ),
         f"\psi_1 \psi_2": observables.symmetrize( psi[0] @ psi[1] ),
         f"\psi_1 \psi_2^\dagger \psi_3 \psi_4^\dagger": observables.symmetrize( psi[0] @ psi_bar[1] @ psi[2] @ psi_bar[3] ),
-        f"R-charge": observables.fermion_number(psi, psi_bar)
+        f"R-charge": observables.r_charge(psi, psi_bar)
     }
 
 
@@ -51,6 +55,7 @@ if __name__ == "__main__":
 
     print("Generating representation and Hamiltonian...")
     rep = fermions.representation(N)
+    psi, psi_bar = rep
     Q = supersyk.supercharge(rep, N, J, seed)
     H = supersyk.hamiltonian(Q)
 
@@ -76,7 +81,6 @@ if __name__ == "__main__":
     # Construct observables and project them onto the ground subspace
     print("Diagonalizing the projected observable...")
     P = observables.projector(eigenvalues, eigenvectors)
-    psi, psi_bar = rep
 
     # Observables under study
     operators = operators(psi, psi_bar)
@@ -120,7 +124,8 @@ if __name__ == "__main__":
             eigs = operators_eigs[name]
             fig, ax = plt.subplots()
             ax.hist(
-                eigs[np.abs(eigs) > tol].real,
+                #eigs[np.abs(eigs) > tol].real,
+                eigs.real,
                 bins=30, alpha=0.75, label=f"$P {name} P$"
             )
             ax.set_xlabel("Eigenvalues")
@@ -133,8 +138,8 @@ if __name__ == "__main__":
     if "spacings" in plots:
         for name, O in operators.items():
 
-            eigs = np.abs(operators_eigs[name])
-            eigs = eigs[np.abs(eigs) > tol]
+            eigs = operators_eigs[name].real
+            eigs = np.unique(eigs[np.abs(eigs) > tol])
             s = observables.level_spacing(eigs)
 
             fig, ax = plt.subplots()
@@ -142,34 +147,5 @@ if __name__ == "__main__":
             ax.set_xlabel("Level spacing $s$")
             ax.set_ylabel("$P(s)$")
             ax.set_title(f"Level spacing statistics for $P {name} P$ ($N={N}$, $J={J:.2f}$)")
-
-
-    # Separate eigenstates with respect to fermion number
-    if "fermion_number" in plots:
-
-        number = observables.fermion_number(psi, psi_bar)
-        spectrum = {}
-        for i in range(eigenvectors.shape[1]):
-
-            vec = eigenvectors[:, i]
-
-            # Rounding is needed to avoid numerical errors,
-            # but not all values might be integers!
-            n = round(np.abs(vec.conj().T @ number @ vec))
-
-            if n not in spectrum:
-                spectrum[n] = []
-
-            spectrum[n].append(eigenvalues[i].real)
-
-        # Plot the spectrum for each fermion number sector
-        fig, ax = plt.subplots()
-        ax.set_title(f"Spectrum of the $\mathcal{{N}}=2$ supersymm. SYK model ($N={N}$, $J={J:.2f}$)")
-        ax.set_xlabel("Energy $E$")
-        ax.set_ylabel("Counts")
-        for i in sorted(spectrum.keys()):
-            eigs = np.array(spectrum[i])
-            ax.hist(eigs[np.abs(eigs) > tol].real, bins=30, alpha=0.75, label=f"$n_f={i}$")
-            ax.legend()
 
     plt.show()

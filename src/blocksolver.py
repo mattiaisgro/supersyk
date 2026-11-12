@@ -2,7 +2,7 @@
 """
 Specialized solver for the block-diagonal Hamiltonian
 of the supersymmetric SYK model, which exploits the
-R-charge symmetry to reduce the size of the Hamiltonian blocks.
+R-charge symmetry to reduce the size of the eigensystem.
 """
 
 import fermions
@@ -10,11 +10,25 @@ import supersyk
 import observables
 
 import numpy as np
-import scipy.sparse
 import matplotlib.pyplot as plt
 
 
+def trace(A):
+
+    """
+    Compute the normalized trace of a matrix.
+    """
+
+    return np.sum(A.diagonal()) / A.shape[0]
+
+
+
 class BlockSolution:
+
+    """
+    An eigensystem solution for a given R-charge sector,
+    making it possible to project operators onto its subspace.
+    """
 
     def __init__(self, eigenvals, eigenvecs, indices):
 
@@ -120,7 +134,7 @@ class BlockSolver:
 
 if __name__ == "__main__":
 
-    N = 12
+    N = 14
     J = 25
     seed = 42
 
@@ -154,10 +168,21 @@ if __name__ == "__main__":
 
 
     # Plots
-    fit, ax = plt.subplots()
+
+    th_ground_deg = 3**(N//2 - 1)
+    if R_charge == 0.0:
+        th_ground_deg *= 2
+
+    ground_deg = np.sum(np.abs(spectrum) < 1e-08)
+    print("Ground state degeneracy:", ground_deg)
+    print("Theoretical degeneracy:", th_ground_deg)
+
+    fig, ax = plt.subplots()
     ax.hist(spectrum, bins=30, alpha=0.75)
+    ax.axhline(th_ground_deg, color='red', linestyle='--', label=f"Th. Ground States")
     ax.set_xlabel("Energy")
     ax.set_ylabel("Counts")
+    ax.legend(loc='best')
     ax.set_title(f"Energy Spectrum for R={R_charge} ($N={N}$, $J={J:.2f}$)")
 
     fig, ax = plt.subplots()
